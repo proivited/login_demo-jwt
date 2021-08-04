@@ -1,5 +1,5 @@
 const formLogin = document.querySelector('#formLogin');
-formLogin.addEventListener('submit', (e)=> {
+formLogin.addEventListener('submit', (e) => {
 
     e.preventDefault();
     const email = document.querySelector('#email');
@@ -8,24 +8,41 @@ formLogin.addEventListener('submit', (e)=> {
     const emailError = document.querySelector('#emailError');
     const passwordError = document.querySelector('#passwordError');
 
-    if( email.textContent == ''){
+    if (email.value == '') {
         emailError.textContent = 'Error, el email no debe estar vacia';
     }
 
-    if( password.textContent == ''){
+    if (password.value == '') {
         passwordError.textContent = 'Error, la contraseña no debe estar vacio';
     }
 
-    if( email.textContent != '' && password.textContent != ''){
+    if (email.value != '' && password.value != '') {
 
-    let req = fetch('https://localhost:8080/login',{
-        method: 'POST',
-        body: JSON.stringify({
-            username: email.textContent,
-            password: password.textContent
+        let req = fetch('http://localhost:8080/login', {
+            method: 'POST',
+            body: JSON.stringify({
+                username: email.value,
+                password: password.value
+            }),
+            headers: {
+                'Content-Type': 'application/jason'
+            }
+        }).then(resp => resp.text()).then(token => {
+
+            if (token.includes('Bearer')) {
+                //console.log(token);
+                localStorage.setItem('token', token);
+                url = window.location;
+                console.log(url);
+                const path = url.pathname.substring(0, url.pathname.lastIndexOf('/') + 1)
+                
+                location.href = path + 'success.html';
+            }else{
+                localStorage.removeItem('token');
+                emailError.textContent = 'Usuario o contrasena incorrecta';
+            }
+
         })
-        }).then((response) => response.json())
-        .then((data) => console.log(data));
 
     }
 
